@@ -1,0 +1,18 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend.Dockerfile
+    command: gunicorn cube_bi.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    volumes: []
+    environment:
+      DJANGO_SETTINGS_MODULE: cube_bi.settings.prod
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    command: ["nginx", "-g", "daemon off;"]
+    volumes: []
+    ports:
+      - "80:80"

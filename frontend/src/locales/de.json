@@ -1,0 +1,62 @@
+{
+  "app": {
+    "title": "Cube BI"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "settings": "Einstellungen"
+  },
+  "topbar": {
+    "month": "Monat",
+    "customer": "Kunde",
+    "all_customers": "Alle Kunden"
+  },
+  "dashboard": {
+    "title": "KI/OCR-Auftragsmonitor",
+    "subtitle": "Analyse der Auftragsentwicklung",
+    "as_of": "Stand: heute, {{time}} Uhr",
+    "refresh": "Aktualisieren",
+    "send": "Senden",
+    "kpi": {
+      "orders_month": "Aufträge Monat",
+      "orders_total": "Aufträge gesamt",
+      "orders_today": "Aufträge heute",
+      "token_status": "Token Status gesamt"
+    },
+    "chart": {
+      "title": "Auftragsentwicklung",
+      "tooltip_orders": "{{count}} Aufträge",
+      "tooltip_orders_one": "{{count}} Auftrag"
+    },
+    "empty": "Keine Daten verfügbar"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "language_de": "Deutsch",
+    "language_en": "Englisch",
+    "auto_refresh": "Automatische Aktualisierung",
+    "auto_refresh_off": "Aus",
+    "auto_refresh_30s": "Alle 30 Sekunden",
+    "auto_refresh_60s": "Alle 60 Sekunden",
+    "about": "Über",
+    "version": "Version {{version}}"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "sign_in": "Einloggen",
+    "signing_in": "Wird eingeloggt...",
+    "error_invalid": "Ungültige Anmeldedaten",
+    "title": "Anmelden",
+    "subtitle": "Willkommen bei Cube BI"
+  },
+  "common": {
+    "loading": "Lädt...",
+    "error": "Fehler",
+    "retry": "Erneut versuchen",
+    "user_menu": "Benutzermenü"
+  }
+}

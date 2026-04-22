@@ -1,0 +1,62 @@
+{
+  "app": {
+    "title": "Cube BI"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "settings": "Settings"
+  },
+  "topbar": {
+    "month": "Month",
+    "customer": "Customer",
+    "all_customers": "All customers"
+  },
+  "dashboard": {
+    "title": "AI/OCR Order Monitor",
+    "subtitle": "Order development analysis",
+    "as_of": "As of today, {{time}}",
+    "refresh": "Refresh",
+    "send": "Send",
+    "kpi": {
+      "orders_month": "Orders this month",
+      "orders_total": "Orders total",
+      "orders_today": "Orders today",
+      "token_status": "Total token status"
+    },
+    "chart": {
+      "title": "Order development",
+      "tooltip_orders": "{{count}} orders",
+      "tooltip_orders_one": "{{count}} order"
+    },
+    "empty": "No data available"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "language_de": "German",
+    "language_en": "English",
+    "auto_refresh": "Auto refresh",
+    "auto_refresh_off": "Off",
+    "auto_refresh_30s": "Every 30 seconds",
+    "auto_refresh_60s": "Every 60 seconds",
+    "about": "About",
+    "version": "Version {{version}}"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "sign_in": "Sign in",
+    "signing_in": "Signing in...",
+    "error_invalid": "Invalid credentials",
+    "title": "Sign in",
+    "subtitle": "Welcome to Cube BI"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "user_menu": "User menu"
+  }
+}
