@@ -6,4 +6,4 @@ from .models import Client
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
-        fields = ["id", "name", "external_id", "is_active", "created_at"]
+        fields = ("id", "name", "external_id", "is_active")

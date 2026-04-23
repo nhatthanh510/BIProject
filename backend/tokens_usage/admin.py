@@ -6,4 +6,5 @@ from .models import TokenQuota
 @admin.register(TokenQuota)
 class TokenQuotaAdmin(admin.ModelAdmin):
     list_display = ("client", "period_start", "tokens_used", "quota")
-    list_filter = ("period_start", "client")
+    list_filter = ("period_start",)
+    search_fields = ("client__name",)

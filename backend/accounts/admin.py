@@ -1,13 +1,14 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
 from .models import User
 
 
 @admin.register(User)
-class CustomUserAdmin(UserAdmin):
-    list_display = ("email", "username", "role", "is_active", "is_staff")
-    list_filter = ("role", "is_active", "is_staff")
-    fieldsets = UserAdmin.fieldsets + (
-        ("Cube BI", {"fields": ("role",)}),
-    )
+class UserAdmin(DjangoUserAdmin):
+    list_display = ("email", "username", "role", "is_staff", "is_active")
+    list_filter = ("role", "is_staff", "is_active")
+    search_fields = ("email", "username")
+    ordering = ("email",)
+    fieldsets = DjangoUserAdmin.fieldsets + ((None, {"fields": ("role",)}),)
+    add_fieldsets = DjangoUserAdmin.add_fieldsets + ((None, {"fields": ("email", "role")}),)

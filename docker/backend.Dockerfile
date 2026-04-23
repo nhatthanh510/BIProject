@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS base
+FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -12,7 +12,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /app/
-RUN pip install --upgrade pip && pip install -r requirements.txt gunicorn
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . /app/
 

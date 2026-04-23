@@ -1,8 +1,7 @@
-"""Data provider factory.
+"""Provider factory.
 
-Reads `DATA_PROVIDER` from Django settings (env-driven) and returns a concrete
-implementation. To plug in the real API, set DATA_PROVIDER=http and implement
-HttpProvider.
+Reads `settings.DATA_PROVIDER` and returns the configured DataProvider.
+Add a new provider by registering it in the PROVIDERS dict.
 """
 from django.conf import settings
 
@@ -10,21 +9,17 @@ from .base import DataProvider
 from .http_provider import HttpProvider
 from .mock_provider import MockProvider
 
-_PROVIDERS: dict[str, type[DataProvider]] = {
+PROVIDERS: dict[str, type[DataProvider]] = {
     "mock": MockProvider,
     "http": HttpProvider,
 }
 
 
 def get_provider() -> DataProvider:
-    name = getattr(settings, "DATA_PROVIDER", "mock")
-    try:
-        provider_cls = _PROVIDERS[name]
-    except KeyError as exc:
+    name = (settings.DATA_PROVIDER or "mock").lower()
+    cls = PROVIDERS.get(name)
+    if cls is None:
         raise ValueError(
-            f"Unknown DATA_PROVIDER '{name}'. Known: {list(_PROVIDERS)}"
-        ) from exc
-    return provider_cls()
-
-
-__all__ = ["DataProvider", "get_provider"]
+            f"Unknown DATA_PROVIDER={name!r}; available: {sorted(PROVIDERS)}"
+        )
+    return cls()

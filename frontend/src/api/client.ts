@@ -1,15 +1,10 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 
-const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-export const api = axios.create({
-  baseURL,
-  withCredentials: true,
-});
-
-// Access token lives in a module-level variable so the axios interceptor can
-// read it without a React re-render. AuthContext syncs it.
 let accessToken: string | null = null;
+let onUnauthorized: (() => void) | null = null;
+let refreshPromise: Promise<string | null> | null = null;
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
@@ -19,63 +14,65 @@ export function getAccessToken(): string | null {
   return accessToken;
 }
 
-let onUnauthorized: (() => void) | null = null;
-export function setOnUnauthorized(fn: (() => void) | null) {
-  onUnauthorized = fn;
+export function setOnUnauthorized(cb: (() => void) | null) {
+  onUnauthorized = cb;
 }
+
+export const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (accessToken) {
-    config.headers.set("Authorization", `Bearer ${accessToken}`);
+    config.headers.set?.("Authorization", `Bearer ${accessToken}`);
   }
   return config;
 });
 
-interface RetryConfig extends InternalAxiosRequestConfig {
-  _retried?: boolean;
-}
-
-let refreshPromise: Promise<string | null> | null = null;
-
 async function refreshAccessToken(): Promise<string | null> {
-  if (!refreshPromise) {
-    refreshPromise = axios
-      .post<{ access: string }>(`${baseURL}/api/auth/refresh/`, {}, { withCredentials: true })
-      .then((res) => {
-        accessToken = res.data.access;
-        return accessToken;
-      })
-      .catch(() => {
-        accessToken = null;
-        return null;
-      })
-      .finally(() => {
-        refreshPromise = null;
-      });
-  }
+  if (refreshPromise) return refreshPromise;
+  refreshPromise = (async () => {
+    try {
+      const resp = await axios.post<{ access: string }>(
+        `${API_URL}/api/auth/refresh/`,
+        {},
+        { withCredentials: true },
+      );
+      const token = resp.data.access;
+      setAccessToken(token);
+      return token;
+    } catch {
+      setAccessToken(null);
+      return null;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
   return refreshPromise;
 }
 
 api.interceptors.response.use(
-  (res) => res,
+  (r) => r,
   async (error: AxiosError) => {
-    const config = error.config as RetryConfig | undefined;
-    if (!config || error.response?.status !== 401 || config._retried) {
-      return Promise.reject(error);
+    const original = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
+    const status = error.response?.status;
+
+    if (status !== 401 || !original || original._retry) {
+      throw error;
     }
-    // Avoid infinite loop on the refresh endpoint itself
-    if (config.url?.includes("/api/auth/refresh")) {
-      return Promise.reject(error);
+    // Don't try to refresh the refresh endpoint itself
+    if (original.url?.includes("/api/auth/refresh/") || original.url?.includes("/api/auth/login/")) {
+      throw error;
     }
 
-    config._retried = true;
+    original._retry = true;
     const newToken = await refreshAccessToken();
-    if (newToken) {
-      config.headers.set("Authorization", `Bearer ${newToken}`);
-      return api(config);
+    if (!newToken) {
+      onUnauthorized?.();
+      throw error;
     }
-
-    if (onUnauthorized) onUnauthorized();
-    return Promise.reject(error);
+    original.headers.set?.("Authorization", `Bearer ${newToken}`);
+    return api.request(original);
   },
 );

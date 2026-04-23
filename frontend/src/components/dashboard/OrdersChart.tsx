@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Area,
@@ -16,25 +17,35 @@ interface OrdersChartProps {
   isLoading?: boolean;
 }
 
+interface ChartPoint {
+  day: string;
+  orders: number;
+  date: string;
+}
+
 export function OrdersChart({ points, isLoading }: OrdersChartProps) {
   const { t } = useTranslation();
-  const data = points.map((p) => {
-    const d = new Date(p.date);
-    return { label: String(d.getDate()).padStart(2, "0"), orders: p.orders, fullDate: p.date };
-  });
 
-  if (isLoading) {
+  const data = useMemo<ChartPoint[]>(
+    () =>
+      points.map((p) => {
+        const d = p.date.slice(-2); // "YYYY-MM-DD" -> "DD"
+        return { day: d, orders: p.orders, date: p.date };
+      }),
+    [points],
+  );
+
+  if (isLoading && data.length === 0) {
     return (
-      <div className="flex h-80 items-center justify-center text-muted-foreground">
+      <div className="flex h-80 items-center justify-center text-sm text-muted-foreground">
         {t("common.loading")}
       </div>
     );
   }
-
   if (data.length === 0) {
     return (
-      <div className="flex h-80 items-center justify-center text-muted-foreground">
-        {t("dashboard.empty")}
+      <div className="flex h-80 items-center justify-center text-sm text-muted-foreground">
+        {t("dashboard.chart.empty")}
       </div>
     );
   }
@@ -42,25 +53,35 @@ export function OrdersChart({ points, isLoading }: OrdersChartProps) {
   return (
     <div className="h-80 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 20, right: 24, left: 0, bottom: 0 }}>
+        <AreaChart data={data} margin={{ top: 12, right: 16, left: 0, bottom: 12 }}>
           <defs>
             <linearGradient id="ordersGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.35} />
               <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.02} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-          <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
-          <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} width={40} />
+          <CartesianGrid strokeDasharray="3 6" vertical={false} stroke="hsl(210 20% 88%)" />
+          <XAxis
+            dataKey="day"
+            tickLine={false}
+            axisLine={false}
+            tick={{ fontSize: 12, fill: "hsl(215 16% 47%)" }}
+          />
+          <YAxis
+            tickLine={false}
+            axisLine={false}
+            tick={{ fontSize: 12, fill: "hsl(215 16% 47%)" }}
+            width={40}
+            allowDecimals={false}
+          />
           <Tooltip
-            cursor={{ stroke: "#94a3b8", strokeDasharray: "4 4" }}
+            cursor={{ stroke: "#3b82f6", strokeDasharray: "3 3" }}
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null;
-              const count = Number(payload[0].value ?? 0);
-              const key = count === 1 ? "dashboard.chart.tooltip_orders_one" : "dashboard.chart.tooltip_orders";
+              const count = payload[0].value as number;
               return (
-                <div className="rounded-md border bg-background px-3 py-1.5 text-sm shadow-sm">
-                  <div className="font-semibold">{t(key, { count })}</div>
+                <div className="rounded-md border bg-popover px-3 py-1.5 text-sm font-medium text-popover-foreground shadow">
+                  {t("dashboard.chart.tooltip_orders", { count })}
                 </div>
               );
             }}
@@ -71,7 +92,7 @@ export function OrdersChart({ points, isLoading }: OrdersChartProps) {
             stroke="#3b82f6"
             strokeWidth={2}
             fill="url(#ordersGradient)"
-            dot={{ r: 3, fill: "#fff", stroke: "#3b82f6", strokeWidth: 2 }}
+            dot={{ r: 2.5, stroke: "#3b82f6", fill: "#fff", strokeWidth: 2 }}
             activeDot={{ r: 5 }}
           />
         </AreaChart>

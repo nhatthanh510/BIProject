@@ -1,22 +1,21 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet } from "react-router";
+import { useTranslation } from "react-i18next";
 
 import { useAuth } from "./AuthContext";
 
 export function ProtectedRoute() {
-  const { user, loading } = useAuth();
-  const location = useLocation();
+  const { isAuthenticated, isLoading } = useAuth();
+  const { t } = useTranslation();
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center text-muted-foreground">
-        <div className="animate-pulse">...</div>
+      <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">
+        {t("common.loading")}
       </div>
     );
   }
-
-  if (!user) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
-
   return <Outlet />;
 }

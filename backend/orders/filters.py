@@ -1,34 +1,29 @@
 from datetime import date
 
 import django_filters
-from django.utils.dateparse import parse_date
 
 from .models import Order
 
 
-class OrderFilter(django_filters.FilterSet):
-    """Filter orders by ?month=YYYY-MM, ?client=<id>, ?status=<status>."""
+def _first_of_next_month(d: date) -> date:
+    return date(d.year + (1 if d.month == 12 else 0), 1 if d.month == 12 else d.month + 1, 1)
 
+
+class OrderFilter(django_filters.FilterSet):
     month = django_filters.CharFilter(method="filter_month")
     client = django_filters.NumberFilter(field_name="client_id")
-    status = django_filters.CharFilter(field_name="status")
+    status = django_filters.ChoiceFilter(choices=Order.Status.choices)
 
     class Meta:
         model = Order
-        fields = ["client", "status", "month"]
+        fields = ["month", "client", "status"]
 
     def filter_month(self, queryset, name, value):
-        if not value:
-            return queryset
+        # value format: YYYY-MM
         try:
-            start = parse_date(f"{value}-01")
-            if start is None:
-                return queryset
-        except (TypeError, ValueError):
-            return queryset
-        # compute first day of next month
-        if start.month == 12:
-            end = date(start.year + 1, 1, 1)
-        else:
-            end = date(start.year, start.month + 1, 1)
+            year_s, month_s = value.split("-")
+            start = date(int(year_s), int(month_s), 1)
+        except (ValueError, AttributeError):
+            return queryset.none()
+        end = _first_of_next_month(start)
         return queryset.filter(created_at__date__gte=start, created_at__date__lt=end)

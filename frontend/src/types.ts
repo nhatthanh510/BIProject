@@ -1,8 +1,10 @@
+export type UserRole = "admin" | "analyst" | "viewer";
+
 export interface User {
   id: number;
   email: string;
   username: string;
-  role: "admin" | "analyst" | "viewer";
+  role: UserRole;
   full_name: string;
 }
 
@@ -11,7 +13,6 @@ export interface Client {
   name: string;
   external_id: string | null;
   is_active: boolean;
-  created_at: string;
 }
 
 export interface LoginResponse {
@@ -23,18 +24,29 @@ export interface RefreshResponse {
   access: string;
 }
 
+export interface KpiValue {
+  value: number;
+}
+
+export interface TokenStatus {
+  tokens_used: number;
+  quota: number;
+  percent_used: number;
+}
+
+export interface SummaryFilters {
+  month: string;
+  client_id: number | null;
+}
+
 export interface SummaryResponse {
-  filters: { month: string; client_id: number | null };
+  filters: SummaryFilters;
   as_of: string;
   kpis: {
-    orders_month: { value: number };
-    orders_total: { value: number };
-    orders_today: { value: number };
-    token_status: {
-      tokens_used: number;
-      quota: number;
-      percent_used: number;
-    };
+    orders_month: KpiValue;
+    orders_total: KpiValue;
+    orders_today: KpiValue;
+    token_status: TokenStatus;
   };
 }
 
@@ -44,7 +56,12 @@ export interface TimelinePoint {
 }
 
 export interface TimelineResponse {
-  filters: { month: string; client_id: number | null };
+  filters: SummaryFilters;
   as_of: string;
   points: TimelinePoint[];
+}
+
+export interface DashboardFilters {
+  month: string;
+  clientId: string;
 }

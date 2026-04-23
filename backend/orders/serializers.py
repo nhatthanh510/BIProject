@@ -8,7 +8,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = [
+        fields = (
             "id",
             "client",
             "client_name",
@@ -17,4 +17,4 @@ class OrderSerializer(serializers.ModelSerializer):
             "status",
             "document_type",
             "tokens_consumed",
-        ]
+        )

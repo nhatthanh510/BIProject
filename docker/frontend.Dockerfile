@@ -1,14 +1,16 @@
-FROM node:20-alpine AS builder
+# Build context should be the repo root so we can copy docker/nginx/default.conf.
+# docker-compose.prod.yml sets this explicitly.
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 COPY frontend/package.json frontend/package-lock.json* ./
-RUN npm ci || npm install
+RUN npm install
 
-COPY frontend/. .
+COPY frontend/ ./
 RUN npm run build
 
-FROM nginx:1.27-alpine AS runtime
+FROM nginx:1.27-alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf

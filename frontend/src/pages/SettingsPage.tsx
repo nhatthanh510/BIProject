@@ -5,23 +5,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export function SettingsPage() {
   const { t, i18n } = useTranslation();
+  const current = i18n.language.startsWith("de") ? "de" : "en";
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-2xl space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">{t("settings.title")}</h1>
       </div>
 
-      <Card className="max-w-xl">
+      <Card>
         <CardHeader>
           <CardTitle>{t("settings.language")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Select
-            value={i18n.language.startsWith("de") ? "de" : "en"}
-            onValueChange={(value) => i18n.changeLanguage(value)}
+            value={current}
+            onValueChange={(v) => {
+              void i18n.changeLanguage(v);
+            }}
           >
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-[240px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -32,14 +35,12 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card className="max-w-xl">
+      <Card>
         <CardHeader>
-          <CardTitle>{t("settings.about")}</CardTitle>
+          <CardTitle>{t("settings.version")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            {t("settings.version", { version: "0.1.0" })}
-          </p>
+          <p className="text-sm text-muted-foreground">Cube BI v0.2.0</p>
         </CardContent>
       </Card>
     </div>

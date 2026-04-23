@@ -1,62 +1,51 @@
 {
-  "app": {
-    "title": "Cube BI"
-  },
+  "app": { "title": "Cube BI" },
   "nav": {
     "dashboard": "Dashboard",
     "settings": "Settings"
   },
   "topbar": {
     "month": "Month",
-    "customer": "Customer",
-    "all_customers": "All customers"
+    "client": "Client",
+    "all_clients": "All clients"
   },
   "dashboard": {
     "title": "AI/OCR Order Monitor",
-    "subtitle": "Order development analysis",
+    "subtitle": "Analysis of order development",
     "as_of": "As of today, {{time}}",
-    "refresh": "Refresh",
     "send": "Send",
+    "refresh": "Refresh",
     "kpi": {
-      "orders_month": "Orders this month",
-      "orders_total": "Orders total",
+      "orders_month": "Orders (month)",
+      "orders_total": "Orders (total)",
       "orders_today": "Orders today",
-      "token_status": "Total token status"
+      "token_status": "Token status"
     },
     "chart": {
       "title": "Order development",
-      "tooltip_orders": "{{count}} orders",
-      "tooltip_orders_one": "{{count}} order"
-    },
-    "empty": "No data available"
+      "tooltip_orders_one": "{{count}} order",
+      "tooltip_orders_other": "{{count}} orders",
+      "empty": "No data for this month."
+    }
+  },
+  "auth": {
+    "login_title": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "logout": "Sign out",
+    "error": "Invalid credentials."
   },
   "settings": {
     "title": "Settings",
     "language": "Language",
     "language_de": "German",
     "language_en": "English",
-    "auto_refresh": "Auto refresh",
-    "auto_refresh_off": "Off",
-    "auto_refresh_30s": "Every 30 seconds",
-    "auto_refresh_60s": "Every 60 seconds",
-    "about": "About",
-    "version": "Version {{version}}"
-  },
-  "auth": {
-    "login": "Login",
-    "logout": "Logout",
-    "email": "Email",
-    "password": "Password",
-    "sign_in": "Sign in",
-    "signing_in": "Signing in...",
-    "error_invalid": "Invalid credentials",
-    "title": "Sign in",
-    "subtitle": "Welcome to Cube BI"
+    "version": "Version"
   },
   "common": {
     "loading": "Loading...",
-    "error": "Error",
-    "retry": "Retry",
-    "user_menu": "User menu"
+    "prev": "Previous",
+    "next": "Next"
   }
 }

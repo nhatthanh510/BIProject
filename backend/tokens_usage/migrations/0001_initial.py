@@ -3,7 +3,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -18,11 +17,14 @@ class Migration(migrations.Migration):
                 ("period_start", models.DateField(help_text="First day of the month this quota applies to")),
                 ("quota", models.PositiveIntegerField()),
                 ("tokens_used", models.PositiveIntegerField(default=0)),
-                ("client", models.ForeignKey(
-                    on_delete=django.db.models.deletion.CASCADE,
-                    related_name="token_quotas",
-                    to="clients.client",
-                )),
+                (
+                    "client",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="token_quotas",
+                        to="clients.client",
+                    ),
+                ),
             ],
             options={
                 "ordering": ["-period_start"],

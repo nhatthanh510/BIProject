@@ -6,63 +6,55 @@ import type { User } from "@/types";
 
 interface AuthState {
   user: User | null;
-  loading: boolean;
+  isAuthenticated: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthState | null>(null);
+const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  // On boot, try to get a fresh access token via refresh cookie; if we succeed,
-  // fetch /me and consider the user logged in.
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        // api.get will auto-refresh on 401 via the interceptor
-        const me = await fetchMe();
-        if (!cancelled) setUser(me);
-      } catch {
-        if (!cancelled) setUser(null);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setOnUnauthorized(() => {
-      setAccessToken(null);
       setUser(null);
+      setAccessToken(null);
     });
+    (async () => {
+      try {
+        const me = await fetchMe();
+        setUser(me);
+      } catch {
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
     return () => setOnUnauthorized(null);
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const res = await apiLogin(email, password);
-    setAccessToken(res.access);
-    setUser(res.user);
+    const resp = await apiLogin(email, password);
+    setAccessToken(resp.access);
+    setUser(resp.user);
   }, []);
 
   const logout = useCallback(async () => {
     try {
       await apiLogout();
-    } finally {
-      setAccessToken(null);
-      setUser(null);
+    } catch {
+      // swallow; we still want to clear local state
     }
+    setAccessToken(null);
+    setUser(null);
   }, []);
 
   const value = useMemo<AuthState>(
-    () => ({ user, loading, login, logout }),
-    [user, loading, login, logout],
+    () => ({ user, isAuthenticated: !!user, isLoading, login, logout }),
+    [user, isLoading, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -70,6 +62,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth(): AuthState {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
 }

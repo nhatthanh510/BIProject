@@ -15,7 +15,7 @@ import { formatNumber } from "@/lib/format";
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
-  const locale = i18n.language.startsWith("de") ? "de" : "en";
+  const locale: "de" | "en" = i18n.language.startsWith("de") ? "de" : "en";
   const { filters } = useDashboardFilters();
   const summary = useDashboardSummary(filters);
   const timeline = useOrdersTimeline(filters);

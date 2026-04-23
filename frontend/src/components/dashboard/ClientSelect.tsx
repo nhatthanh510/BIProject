@@ -1,32 +1,31 @@
 import { useTranslation } from "react-i18next";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useDashboardFilters } from "@/hooks/useDashboardFilters";
 import { useClients } from "@/hooks/useClients";
 
-interface ClientSelectProps {
-  value: number | null;
-  onChange: (value: number | null) => void;
-}
+const ALL = "__all__";
 
-const ALL = "all";
-
-export function ClientSelect({ value, onChange }: ClientSelectProps) {
+export function ClientSelect() {
   const { t } = useTranslation();
-  const { data: clients } = useClients();
+  const { filters, setClient } = useDashboardFilters();
+  const { data: clients = [] } = useClients();
+
+  const value = filters.clientId || ALL;
 
   return (
     <Select
-      value={value === null ? ALL : String(value)}
-      onValueChange={(next) => onChange(next === ALL ? null : Number(next))}
+      value={value}
+      onValueChange={(v) => setClient(v === ALL ? "" : v)}
     >
-      <SelectTrigger className="min-w-[12rem]">
-        <SelectValue placeholder={t("topbar.customer")} />
+      <SelectTrigger className="w-[200px]">
+        <SelectValue placeholder={t("topbar.client")} />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value={ALL}>{t("topbar.all_customers")}</SelectItem>
-        {clients?.map((client) => (
-          <SelectItem key={client.id} value={String(client.id)}>
-            {client.name}
+        <SelectItem value={ALL}>{t("topbar.all_clients")}</SelectItem>
+        {clients.map((c) => (
+          <SelectItem key={c.id} value={String(c.id)}>
+            {c.name}
           </SelectItem>
         ))}
       </SelectContent>

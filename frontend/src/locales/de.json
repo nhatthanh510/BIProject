@@ -1,22 +1,20 @@
 {
-  "app": {
-    "title": "Cube BI"
-  },
+  "app": { "title": "Cube BI" },
   "nav": {
     "dashboard": "Dashboard",
     "settings": "Einstellungen"
   },
   "topbar": {
     "month": "Monat",
-    "customer": "Kunde",
-    "all_customers": "Alle Kunden"
+    "client": "Kunde",
+    "all_clients": "Alle Kunden"
   },
   "dashboard": {
     "title": "KI/OCR-Auftragsmonitor",
     "subtitle": "Analyse der Auftragsentwicklung",
     "as_of": "Stand: heute, {{time}} Uhr",
-    "refresh": "Aktualisieren",
     "send": "Senden",
+    "refresh": "Aktualisieren",
     "kpi": {
       "orders_month": "Aufträge Monat",
       "orders_total": "Aufträge gesamt",
@@ -25,38 +23,29 @@
     },
     "chart": {
       "title": "Auftragsentwicklung",
-      "tooltip_orders": "{{count}} Aufträge",
-      "tooltip_orders_one": "{{count}} Auftrag"
-    },
-    "empty": "Keine Daten verfügbar"
+      "tooltip_orders_one": "{{count}} Auftrag",
+      "tooltip_orders_other": "{{count}} Aufträge",
+      "empty": "Keine Daten für diesen Monat."
+    }
+  },
+  "auth": {
+    "login_title": "Anmelden",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "submit": "Anmelden",
+    "logout": "Abmelden",
+    "error": "Ungültige Anmeldedaten."
   },
   "settings": {
     "title": "Einstellungen",
     "language": "Sprache",
     "language_de": "Deutsch",
     "language_en": "Englisch",
-    "auto_refresh": "Automatische Aktualisierung",
-    "auto_refresh_off": "Aus",
-    "auto_refresh_30s": "Alle 30 Sekunden",
-    "auto_refresh_60s": "Alle 60 Sekunden",
-    "about": "Über",
-    "version": "Version {{version}}"
-  },
-  "auth": {
-    "login": "Anmelden",
-    "logout": "Abmelden",
-    "email": "E-Mail",
-    "password": "Passwort",
-    "sign_in": "Einloggen",
-    "signing_in": "Wird eingeloggt...",
-    "error_invalid": "Ungültige Anmeldedaten",
-    "title": "Anmelden",
-    "subtitle": "Willkommen bei Cube BI"
+    "version": "Version"
   },
   "common": {
     "loading": "Lädt...",
-    "error": "Fehler",
-    "retry": "Erneut versuchen",
-    "user_menu": "Benutzermenü"
+    "prev": "Zurück",
+    "next": "Weiter"
   }
 }

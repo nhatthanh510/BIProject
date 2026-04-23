@@ -120,13 +120,13 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-# Refresh-token cookie settings (read by accounts.views)
+# Refresh-token cookie (read by accounts.views)
 JWT_REFRESH_COOKIE_NAME = "refresh_token"
 JWT_REFRESH_COOKIE_PATH = "/api/auth"
 JWT_COOKIE_SECURE = env.bool("JWT_COOKIE_SECURE", default=False)
 JWT_COOKIE_SAMESITE = env("JWT_COOKIE_SAMESITE", default="Lax")
 
-# CORS - the frontend
+# CORS
 CORS_ALLOWED_ORIGINS = env.list(
     "CORS_ALLOWED_ORIGINS",
     default=["http://localhost:5173", "http://127.0.0.1:5173"],

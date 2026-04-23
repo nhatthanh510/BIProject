@@ -1,18 +1,18 @@
-.PHONY: help up down build logs seed migrate shell-backend shell-frontend reset-db lint
+.PHONY: help up down build logs seed migrate makemigrations shell-backend shell-frontend reset-db
 
 help:
 	@echo "Cube BI - common commands"
 	@echo ""
-	@echo "  make up             start all services (db, backend, frontend)"
-	@echo "  make down           stop all services"
-	@echo "  make build          rebuild all images"
-	@echo "  make logs           tail backend + frontend logs"
-	@echo "  make migrate        run Django migrations"
-	@echo "  make seed           seed mock data (clients, orders, tokens)"
-	@echo "  make shell-backend  exec shell in backend container"
-	@echo "  make shell-frontend exec shell in frontend container"
-	@echo "  make reset-db       drop database volume and recreate"
-	@echo ""
+	@echo "  make up              start all services (db, backend, frontend)"
+	@echo "  make down            stop all services"
+	@echo "  make build           rebuild all images"
+	@echo "  make logs            tail backend + frontend logs"
+	@echo "  make makemigrations  generate Django migrations"
+	@echo "  make migrate         run Django migrations"
+	@echo "  make seed            seed mock data (clients, orders, tokens)"
+	@echo "  make shell-backend   exec shell in backend container"
+	@echo "  make shell-frontend  exec shell in frontend container"
+	@echo "  make reset-db        drop database volume and recreate"
 
 up:
 	docker compose up -d --build
@@ -25,6 +25,9 @@ build:
 
 logs:
 	docker compose logs -f backend frontend
+
+makemigrations:
+	docker compose exec backend python manage.py makemigrations
 
 migrate:
 	docker compose exec backend python manage.py migrate

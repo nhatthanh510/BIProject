@@ -2,8 +2,8 @@ import { api } from "./client";
 import type { LoginResponse, User } from "@/types";
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
-  const res = await api.post<LoginResponse>("/api/auth/login/", { email, password });
-  return res.data;
+  const resp = await api.post<LoginResponse>("/api/auth/login/", { email, password });
+  return resp.data;
 }
 
 export async function logout(): Promise<void> {
@@ -11,6 +11,6 @@ export async function logout(): Promise<void> {
 }
 
 export async function fetchMe(): Promise<User> {
-  const res = await api.get<User>("/api/auth/me/");
-  return res.data;
+  const resp = await api.get<User>("/api/auth/me/");
+  return resp.data;
 }

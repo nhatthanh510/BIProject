@@ -9,16 +9,15 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import LoginSerializer, UserSerializer
 
 
-def _set_refresh_cookie(response: Response, refresh_token: str) -> None:
-    max_age = int(settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds())
+def _set_refresh_cookie(response: Response, refresh: str) -> None:
     response.set_cookie(
         key=settings.JWT_REFRESH_COOKIE_NAME,
-        value=refresh_token,
-        max_age=max_age,
+        value=refresh,
         httponly=True,
         secure=settings.JWT_COOKIE_SECURE,
         samesite=settings.JWT_COOKIE_SAMESITE,
         path=settings.JWT_REFRESH_COOKIE_PATH,
+        max_age=int(settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds()),
     )
 
 
@@ -34,15 +33,17 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = LoginSerializer(data=request.data, context={"request": request})
+        serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
 
         refresh = RefreshToken.for_user(user)
-        response = Response({
-            "access": str(refresh.access_token),
-            "user": UserSerializer(user).data,
-        })
+        access = str(refresh.access_token)
+
+        response = Response(
+            {"access": access, "user": UserSerializer(user).data},
+            status=status.HTTP_200_OK,
+        )
         _set_refresh_cookie(response, str(refresh))
         return response
 
@@ -53,20 +54,18 @@ class RefreshView(APIView):
     def post(self, request):
         raw = request.COOKIES.get(settings.JWT_REFRESH_COOKIE_NAME)
         if not raw:
-            return Response({"detail": "No refresh token."}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"detail": "Kein Refresh-Token."}, status=status.HTTP_401_UNAUTHORIZED)
         try:
             refresh = RefreshToken(raw)
-        except (InvalidToken, TokenError):
-            return Response({"detail": "Invalid refresh token."}, status=status.HTTP_401_UNAUTHORIZED)
+        except TokenError as exc:
+            raise InvalidToken(str(exc)) from exc
 
         access = str(refresh.access_token)
-        response = Response({"access": access})
+        response = Response({"access": access}, status=status.HTTP_200_OK)
 
-        if settings.SIMPLE_JWT.get("ROTATE_REFRESH_TOKENS"):
-            refresh.set_jti()
-            refresh.set_exp()
-            refresh.set_iat()
-            _set_refresh_cookie(response, str(refresh))
+        if settings.SIMPLE_JWT.get("ROTATE_REFRESH_TOKENS", False):
+            new_refresh = str(refresh)
+            _set_refresh_cookie(response, new_refresh)
 
         return response
 
