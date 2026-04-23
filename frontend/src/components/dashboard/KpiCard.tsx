@@ -1,29 +1,60 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 
 interface KpiCardProps {
   icon?: ReactNode;
   label: string;
   value: ReactNode;
+  /** Raw numeric value; used to color the flash green (up) or red (down). */
+  numericValue?: number;
   sublabel?: ReactNode;
 }
 
-export function KpiCard({ icon, label, value, sublabel }: KpiCardProps) {
+type Flash = "up" | "down" | "neutral";
+
+const FADE_MS = 1200;
+const FLASH_MS = 1800;
+
+export function KpiCard({ icon, label, value, numericValue, sublabel }: KpiCardProps) {
   const valueKey = typeof value === "string" || typeof value === "number" ? String(value) : undefined;
-  const [pulse, setPulse] = useState(false);
-  const prev = useRef<string | undefined>(valueKey);
+  const [tick, setTick] = useState(0);
+  const [flash, setFlash] = useState<Flash>("neutral");
+  const prevKey = useRef<string | undefined>(valueKey);
+  const prevNum = useRef<number | undefined>(numericValue);
 
   useEffect(() => {
     if (valueKey === undefined) return;
-    if (prev.current !== undefined && prev.current !== valueKey) {
-      setPulse(true);
-      const t = setTimeout(() => setPulse(false), 600);
-      return () => clearTimeout(t);
+    if (prevKey.current === undefined) {
+      prevKey.current = valueKey;
+      prevNum.current = numericValue;
+      return;
     }
-    prev.current = valueKey;
-  }, [valueKey]);
+    if (prevKey.current !== valueKey) {
+      let next: Flash = "neutral";
+      if (
+        typeof numericValue === "number" &&
+        typeof prevNum.current === "number" &&
+        numericValue !== prevNum.current
+      ) {
+        next = numericValue > prevNum.current ? "up" : "down";
+      }
+      prevKey.current = valueKey;
+      prevNum.current = numericValue;
+      setFlash(next);
+      setTick((n) => n + 1);
+    }
+  }, [valueKey, numericValue]);
+
+  const animName =
+    flash === "up" ? "kpi-flash-up" : flash === "down" ? "kpi-flash-down" : "kpi-fade-in";
+  const duration = flash === "neutral" ? FADE_MS : FLASH_MS;
+
+  // Re-trigger by keying on `tick` — React remounts the node and the CSS
+  // animation runs fresh each time.
+  const style: CSSProperties = {
+    animation: `${animName} ${duration}ms ease-out both`,
+  };
 
   return (
     <Card>
@@ -32,13 +63,14 @@ export function KpiCard({ icon, label, value, sublabel }: KpiCardProps) {
           {icon}
           <span>{label}</span>
         </div>
-        <div
-          className={cn(
-            "mt-3 text-3xl font-semibold tabular-nums transition-colors duration-500",
-            pulse && "text-primary",
-          )}
-        >
-          {value}
+        <div className="mt-3 h-9">
+          <div
+            key={`${valueKey}-${tick}`}
+            className="text-3xl font-semibold tabular-nums"
+            style={style}
+          >
+            {value}
+          </div>
         </div>
         {sublabel && <div className="mt-1 text-xs text-muted-foreground">{sublabel}</div>}
       </CardContent>

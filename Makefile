@@ -1,4 +1,4 @@
-.PHONY: help up down build logs seed migrate makemigrations shell-backend shell-frontend reset-db
+.PHONY: help up down build logs seed simulate migrate makemigrations shell-backend shell-frontend reset-db
 
 help:
 	@echo "Cube BI - common commands"
@@ -10,6 +10,7 @@ help:
 	@echo "  make makemigrations  generate Django migrations"
 	@echo "  make migrate         run Django migrations"
 	@echo "  make seed            seed mock data (clients, orders, tokens)"
+	@echo "  make simulate        live-inject orders every few seconds (demo mode)"
 	@echo "  make shell-backend   exec shell in backend container"
 	@echo "  make shell-frontend  exec shell in frontend container"
 	@echo "  make reset-db        drop database volume and recreate"
@@ -34,6 +35,9 @@ migrate:
 
 seed:
 	docker compose exec backend python manage.py seed_mock_data
+
+simulate:
+	docker compose exec backend python manage.py simulate_live
 
 shell-backend:
 	docker compose exec backend sh

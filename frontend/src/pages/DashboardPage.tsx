@@ -64,6 +64,7 @@ export function DashboardPage() {
           icon={<Euro className="h-4 w-4 text-primary" />}
           label={t("dashboard.kpi.revenue_month")}
           value={formatCurrency(revenue?.month_to_date ?? 0, locale, currency)}
+          numericValue={revenue?.month_to_date}
           sublabel={t("dashboard.kpi.revenue_today", {
             value: formatCurrency(revenue?.today ?? 0, locale, currency),
           })}
@@ -79,6 +80,7 @@ export function DashboardPage() {
           icon={<FileText className="h-4 w-4 text-primary" />}
           label={t("dashboard.kpi.orders_month")}
           value={formatNumber(kpis?.orders_month.value ?? 0, locale)}
+          numericValue={kpis?.orders_month.value}
           sublabel={t("dashboard.kpi.orders_today_short", {
             value: formatNumber(kpis?.orders_today.value ?? 0, locale),
           })}
@@ -97,11 +99,13 @@ export function DashboardPage() {
           icon={<Files className="h-4 w-4 text-primary" />}
           label={t("dashboard.kpi.orders_total")}
           value={formatNumber(kpis?.orders_total.value ?? 0, locale)}
+          numericValue={kpis?.orders_total.value}
         />
         <KpiCard
           icon={<TrendingUp className="h-4 w-4 text-primary" />}
           label={t("dashboard.kpi.orders_today")}
           value={formatNumber(kpis?.orders_today.value ?? 0, locale)}
+          numericValue={kpis?.orders_today.value}
         />
       </div>
 

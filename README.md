@@ -1,30 +1,30 @@
 # Cube BI
 
-BI-Dashboard zur Überwachung der KI/OCR-Auftragsentwicklung und des Token-Verbrauchs der Kunden.
+BI dashboard for monitoring AI/OCR order volume, token usage, and per-client billing run-rate.
 
 - **Backend:** Django 6.0.4 + Django REST Framework + SimpleJWT
 - **Frontend:** React 19 + TypeScript + Vite 7 + Tailwind CSS v4 + shadcn/ui + Recharts 3
-- **Datenbank:** PostgreSQL 16
-- **Sprachen:** Deutsch (Standard) & Englisch via `react-i18next`
-- **Läuft in:** Docker Compose
+- **Database:** PostgreSQL 16
+- **Languages:** German (default) & English via `react-i18next`
+- **Runs in:** Docker Compose
 
 ---
 
 ## Quickstart (Dev)
 
 ```bash
-# 1) Env-Files anlegen
+# 1) Create env files
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 
-# 2) Alles hochfahren
+# 2) Bring everything up
 make up
 
-# 3) Datenbank migrieren und Mock-Daten seeden
+# 3) Migrate the database and seed mock data
 make migrate
 make seed
 
-# 4) Öffnen
+# 4) Open
 # Frontend:     http://localhost:5173
 # Backend API:  http://localhost:8000/api/
 # Django Admin: http://localhost:8000/admin/
@@ -34,55 +34,101 @@ make seed
 
 ---
 
-## Projektstruktur
+## Project structure
 
 ```
 BIProject/
 ├── docker-compose.yml          # Dev: db + backend + frontend (Vite)
-├── docker-compose.prod.yml     # Prod-Overrides: gunicorn + nginx
+├── docker-compose.prod.yml     # Prod overrides: gunicorn + nginx
 ├── docker/
 │   ├── backend.Dockerfile         # Prod (gunicorn)
-│   ├── backend.dev.Dockerfile     # Dev (runserver + Hot Reload)
-│   ├── frontend.Dockerfile        # Prod (Multi-Stage: Node-Build + nginx)
-│   ├── frontend.dev.Dockerfile    # Dev (Vite Hot Reload)
+│   ├── backend.dev.Dockerfile     # Dev (runserver + hot reload)
+│   ├── frontend.Dockerfile        # Prod (multi-stage: Node build + nginx)
+│   ├── frontend.dev.Dockerfile    # Dev (Vite hot reload)
 │   └── nginx/default.conf
-├── backend/                    # Django-Projekt
+├── backend/                    # Django project
 │   ├── cube_bi/settings/          # base.py, dev.py, prod.py
-│   ├── accounts/                  # Custom User, JWT-Login/Refresh/Logout/Me
-│   ├── clients/ orders/ tokens_usage/   # Domänenmodelle
+│   ├── accounts/                  # Custom User, JWT login/refresh/logout/me
+│   ├── clients/ orders/ tokens_usage/   # Domain models
 │   ├── dashboard/                 # /api/dashboard/summary, /orders-timeline
-│   ├── services/providers/        # Pluggable Data-Provider (mock/http)
-│   └── core/management/commands/seed_mock_data.py
+│   ├── services/providers/        # Pluggable data provider (mock/http)
+│   └── core/management/commands/
+│       ├── seed_mock_data.py     # Deterministic mock data
+│       └── simulate_live.py      # Live traffic for demos
 └── frontend/                   # React + Vite + TS
     └── src/
-        ├── api/                   # axios-Client, Auth, Dashboard
+        ├── api/                   # axios client, auth, dashboard
         ├── auth/                  # AuthContext, ProtectedRoute
         ├── components/{ui,layout,dashboard}/
-        ├── hooks/                 # TanStack Query Hooks + Filter
+        ├── hooks/                 # TanStack Query hooks + filters
         ├── locales/{de,en}.json
         ├── pages/
-        └── lib/                   # utils.ts, format.ts (de-DE)
+        └── lib/                   # utils.ts, format.ts
 ```
 
 ---
 
-## Pluggable Data-Provider
+## Demo mode (live simulation)
 
-Heute Mock-Daten aus der lokalen DB, später die echte Kunden-API — ohne UI-Änderung.
+For customer presentations there's a command that injects new orders in
+real time. The customer sees numbers rising, the fade-in animation on the
+KPI cards, and the run-rate projection shifting.
+
+```bash
+# In a second terminal, alongside the running stack:
+make simulate
+```
+
+Default: every ~8 seconds (±40% jitter) insert 1–3 new orders for random
+active clients. `Ctrl+C` to stop.
+
+What moves on the dashboard:
+
+- **Revenue (month)** and **Projected month-end** tick up (auto-refresh every 10s)
+- **Orders (month / today)** climb
+- **Token-status bar** creeps right (quota usage is updated in lockstep)
+- **Chart** grows taller after each timeline refresh (30s)
+- Every value change triggers a subtle fade-in animation
+- **Live dot** in the top right pulses green
+
+Fine-tune straight from the CLI:
+
+```bash
+# Faster and denser for a punchy demo
+docker compose exec backend python manage.py simulate_live --interval 4 --max-orders 5
+
+# Single tick (e.g. "simulate a refresh click")
+docker compose exec backend python manage.py simulate_live --once
+
+# Focus on one client
+docker compose exec backend python manage.py simulate_live --client-id 3 --interval 4
+```
+
+Frontend refresh cadence:
+
+- Summary KPIs poll every **10s**
+- Orders chart polls every **10s**
+- Refresh button (top right) invalidates all dashboard queries immediately
+
+---
+
+## Pluggable data provider
+
+Today it serves mock data from the local DB; later the real customer API — without any UI change.
 
 ```
 backend/services/providers/
-├── base.py           # Abstract DataProvider (Schnittstelle)
-├── mock_provider.py  # liest aus der lokalen Django-DB
-├── http_provider.py  # Stub — echte Kunden-API hier einbauen
-└── __init__.py       # get_provider() liest DATA_PROVIDER aus .env
+├── base.py           # Abstract DataProvider (interface)
+├── mock_provider.py  # Reads from the local Django DB
+├── http_provider.py  # Stub — wire up the real customer API here
+└── __init__.py       # get_provider() reads DATA_PROVIDER from .env
 ```
 
-Umschalten in `backend/.env`:
+Switch in `backend/.env`:
 
 ```
-DATA_PROVIDER=mock          # Standard
-# oder
+DATA_PROVIDER=mock          # default
+# or
 DATA_PROVIDER=http
 HTTP_PROVIDER_BASE_URL=https://example.com/api
 HTTP_PROVIDER_API_KEY=secret
@@ -90,27 +136,28 @@ HTTP_PROVIDER_API_KEY=secret
 
 ---
 
-## API-Endpunkte
+## API endpoints
 
-| Endpunkt | Zweck |
+| Endpoint | Purpose |
 |---|---|
-| `POST /api/auth/login/` | Login, setzt `refresh_token` als httpOnly-Cookie |
-| `POST /api/auth/refresh/` | Neues Access-Token via Refresh-Cookie |
-| `POST /api/auth/logout/` | Refresh-Cookie löschen |
-| `GET  /api/auth/me/` | Aktueller User |
-| `GET  /api/clients/` | Liste der Kunden |
-| `GET  /api/orders/?month=YYYY-MM&client=<id>&status=` | Paginierte Aufträge |
-| `GET  /api/dashboard/summary/?month=YYYY-MM&client=<id>` | 4 KPIs |
-| `GET  /api/dashboard/orders-timeline/?month=YYYY-MM&client=<id>` | Tageszähler fürs Chart |
+| `POST /api/auth/login/` | Login; sets `refresh_token` as an httpOnly cookie |
+| `POST /api/auth/refresh/` | New access token via the refresh cookie |
+| `POST /api/auth/logout/` | Clears the refresh cookie |
+| `GET  /api/auth/me/` | Current user |
+| `GET  /api/clients/` | List of clients |
+| `GET  /api/orders/?month=YYYY-MM&client=<id>&status=` | Paginated orders |
+| `GET  /api/token-quotas/?month=YYYY-MM&client=<id>` | Quotas + usage + % |
+| `GET  /api/dashboard/summary/?month=YYYY-MM&client=<id>` | KPIs incl. revenue & run-rate |
+| `GET  /api/dashboard/orders-timeline/?month=YYYY-MM&client=<id>` | Daily order counts for the chart |
 
 ---
 
-## Prod-Deployment
+## Prod deployment
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
 
-- Backend via **gunicorn** (3 Worker), `DJANGO_SETTINGS_MODULE=cube_bi.settings.prod`.
-- Frontend statisch gebaut, via **nginx** auf Port 80; `/api/*` → Backend.
-- Vor dem ersten Start: `SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `JWT_COOKIE_SECURE=True` anpassen.
+- Backend via **gunicorn** (3 workers), `DJANGO_SETTINGS_MODULE=cube_bi.settings.prod`.
+- Frontend built statically, served via **nginx** on port 80; `/api/*` → backend.
+- Before first start, set: `SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `JWT_COOKIE_SECURE=True`.
