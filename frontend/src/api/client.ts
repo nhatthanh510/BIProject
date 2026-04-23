@@ -1,13 +1,28 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const ACCESS_TOKEN_KEY = "cube_bi.access_token";
 
-let accessToken: string | null = null;
+function loadStoredToken(): string | null {
+  try {
+    return localStorage.getItem(ACCESS_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+let accessToken: string | null = loadStoredToken();
 let onUnauthorized: (() => void) | null = null;
 let refreshPromise: Promise<string | null> | null = null;
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
+  try {
+    if (token) localStorage.setItem(ACCESS_TOKEN_KEY, token);
+    else localStorage.removeItem(ACCESS_TOKEN_KEY);
+  } catch {
+    // storage may be unavailable (private mode); in-memory copy still works
+  }
 }
 
 export function getAccessToken(): string | null {

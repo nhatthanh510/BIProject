@@ -31,6 +31,16 @@
       "tooltip_orders_one": "{{count}} order",
       "tooltip_orders_other": "{{count}} orders",
       "empty": "No data for this month."
+    },
+    "share": {
+      "copy": "Copy summary",
+      "copied": "Copied",
+      "email": "Send by email",
+      "subject": "Cube BI report · {{month}} · {{scope}}",
+      "header": "Cube BI report – {{month}} – {{scope}}",
+      "of_target": "of target",
+      "footer": "As of: {{ts}}",
+      "copy_fallback": "Copy the text manually:"
     }
   },
   "auth": {

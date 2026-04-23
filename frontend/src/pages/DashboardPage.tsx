@@ -1,13 +1,14 @@
-import { Euro, FileText, Files, Send, TrendingUp } from "lucide-react";
+import { Euro, FileText, Files, TrendingUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { RunRateCard } from "@/components/dashboard/RunRateCard";
 import { TokenStatusCard } from "@/components/dashboard/TokenStatusCard";
 import { OrdersChart } from "@/components/dashboard/OrdersChart";
 import { RefreshButton } from "@/components/dashboard/RefreshButton";
+import { ShareButton } from "@/components/dashboard/ShareButton";
+import { useClients } from "@/hooks/useClients";
 import { useDashboardFilters } from "@/hooks/useDashboardFilters";
 import { useDashboardSummary } from "@/hooks/useDashboardSummary";
 import { useOrdersTimeline } from "@/hooks/useOrdersTimeline";
@@ -20,7 +21,11 @@ export function DashboardPage() {
   const { filters } = useDashboardFilters();
   const summary = useDashboardSummary(filters);
   const timeline = useOrdersTimeline(filters);
+  const { data: clients = [] } = useClients();
   const now = useNow(60_000);
+
+  const selectedClientName =
+    filters.clientId ? clients.find((c) => String(c.id) === filters.clientId)?.name ?? null : null;
 
   const timeLabel = new Intl.DateTimeFormat(locale === "de" ? "de-DE" : "en-US", {
     hour: "2-digit",
@@ -44,9 +49,12 @@ export function DashboardPage() {
             <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald-500" aria-hidden="true" />
             {t("dashboard.as_of", { time: timeLabel })}
           </span>
-          <Button variant="outline" size="icon" aria-label={t("dashboard.send")}>
-            <Send className="h-4 w-4" />
-          </Button>
+          <ShareButton
+            summary={summary.data}
+            monthKey={filters.month}
+            clientName={selectedClientName}
+            locale={locale}
+          />
           <RefreshButton />
         </div>
       </div>
