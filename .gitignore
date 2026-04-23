@@ -28,6 +28,8 @@ dist/
 dist-ssr/
 *.local
 .vite/
+.tsbuild/
+*.tsbuildinfo
 
 # Env
 .env
