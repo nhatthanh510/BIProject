@@ -31,13 +31,13 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{t("dashboard.title")}</h1>
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">{t("dashboard.title")}</h1>
           <p className="text-sm text-muted-foreground">{t("dashboard.subtitle")}</p>
         </div>
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-          <span>{t("dashboard.as_of", { time: timeLabel })}</span>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground sm:gap-3">
+          <span className="hidden sm:inline">{t("dashboard.as_of", { time: timeLabel })}</span>
           <Button variant="outline" size="icon" aria-label={t("dashboard.send")}>
             <Send className="h-4 w-4" />
           </Button>

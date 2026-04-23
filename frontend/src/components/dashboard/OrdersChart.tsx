@@ -37,21 +37,21 @@ export function OrdersChart({ points, isLoading }: OrdersChartProps) {
 
   if (isLoading && data.length === 0) {
     return (
-      <div className="flex h-80 items-center justify-center text-sm text-muted-foreground">
+      <div className="flex h-64 items-center justify-center text-sm text-muted-foreground sm:h-80">
         {t("common.loading")}
       </div>
     );
   }
   if (data.length === 0) {
     return (
-      <div className="flex h-80 items-center justify-center text-sm text-muted-foreground">
+      <div className="flex h-64 items-center justify-center text-sm text-muted-foreground sm:h-80">
         {t("dashboard.chart.empty")}
       </div>
     );
   }
 
   return (
-    <div className="h-80 w-full">
+    <div className="h-64 w-full sm:h-80">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 12, right: 16, left: 0, bottom: 12 }}>
           <defs>

@@ -18,7 +18,7 @@ export function ClientSelect() {
       value={value}
       onValueChange={(v) => setClient(v === ALL ? "" : v)}
     >
-      <SelectTrigger className="w-[200px]">
+      <SelectTrigger className="w-[140px] sm:w-[200px]">
         <SelectValue placeholder={t("topbar.client")} />
       </SelectTrigger>
       <SelectContent>
