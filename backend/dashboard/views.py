@@ -6,6 +6,8 @@ from rest_framework.views import APIView
 
 from services.providers import get_provider
 
+from .serializers import SummaryResponseSerializer, TimelineResponseSerializer
+
 
 def _parse_month(value: str | None) -> date:
     if value:
@@ -34,33 +36,33 @@ class SummaryView(APIView):
 
         summary = get_provider().get_summary(client_id=client_id, month=month)
 
-        return Response(
-            {
-                "filters": {
-                    "month": f"{summary.month:%Y-%m}",
-                    "client_id": summary.client_id,
+        payload = {
+            "filters": {
+                "month": f"{summary.month:%Y-%m}",
+                "client_id": summary.client_id,
+            },
+            "as_of": summary.as_of,
+            "kpis": {
+                "orders_month": {"value": summary.orders_month.value},
+                "orders_total": {"value": summary.orders_total.value},
+                "orders_today": {"value": summary.orders_today.value},
+                "token_status": {
+                    "tokens_used": summary.token_status.tokens_used,
+                    "quota": summary.token_status.quota,
+                    "percent_used": summary.token_status.percent_used,
                 },
-                "as_of": summary.as_of.isoformat(),
-                "kpis": {
-                    "orders_month": {"value": summary.orders_month.value},
-                    "orders_total": {"value": summary.orders_total.value},
-                    "orders_today": {"value": summary.orders_today.value},
-                    "token_status": {
-                        "tokens_used": summary.token_status.tokens_used,
-                        "quota": summary.token_status.quota,
-                        "percent_used": summary.token_status.percent_used,
-                    },
-                    "revenue": {
-                        "month_to_date": summary.revenue.month_to_date,
-                        "today": summary.revenue.today,
-                        "projected_month": summary.revenue.projected_month,
-                        "target_month": summary.revenue.target_month,
-                        "pace_pct": summary.revenue.pace_pct,
-                        "currency": summary.revenue.currency,
-                    },
+                "revenue": {
+                    "month_to_date": summary.revenue.month_to_date,
+                    "today": summary.revenue.today,
+                    "projected_month": summary.revenue.projected_month,
+                    "target_month": summary.revenue.target_month,
+                    "pace_pct": summary.revenue.pace_pct,
+                    "currency": summary.revenue.currency,
                 },
-            }
-        )
+            },
+        }
+        serializer = SummaryResponseSerializer(payload)
+        return Response(serializer.data)
 
 
 class OrdersTimelineView(APIView):
@@ -70,13 +72,13 @@ class OrdersTimelineView(APIView):
 
         timeline = get_provider().get_orders_timeline(client_id=client_id, month=month)
 
-        return Response(
-            {
-                "filters": {
-                    "month": f"{timeline.month:%Y-%m}",
-                    "client_id": timeline.client_id,
-                },
-                "as_of": timeline.as_of.isoformat(),
-                "points": [{"date": p.date.isoformat(), "orders": p.orders} for p in timeline.points],
-            }
-        )
+        payload = {
+            "filters": {
+                "month": f"{timeline.month:%Y-%m}",
+                "client_id": timeline.client_id,
+            },
+            "as_of": timeline.as_of,
+            "points": [{"date": p.date, "orders": p.orders} for p in timeline.points],
+        }
+        serializer = TimelineResponseSerializer(payload)
+        return Response(serializer.data)
