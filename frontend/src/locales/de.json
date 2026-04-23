@@ -12,14 +12,19 @@
   "dashboard": {
     "title": "KI/OCR-Auftragsmonitor",
     "subtitle": "Analyse der Auftragsentwicklung",
-    "as_of": "Stand: heute, {{time}} Uhr",
+    "as_of": "Live · {{time}} Uhr",
     "send": "Senden",
     "refresh": "Aktualisieren",
     "kpi": {
       "orders_month": "Aufträge Monat",
       "orders_total": "Aufträge gesamt",
       "orders_today": "Aufträge heute",
-      "token_status": "Token Status gesamt"
+      "orders_today_short": "Heute: {{value}}",
+      "token_status": "Token Status gesamt",
+      "revenue_month": "Umsatz Monat",
+      "revenue_today": "Heute: {{value}}",
+      "projected_month": "Prognose Monatsende",
+      "of_target": "von Ziel {{target}}"
     },
     "chart": {
       "title": "Auftragsentwicklung",
@@ -46,6 +51,8 @@
   "common": {
     "loading": "Lädt...",
     "prev": "Zurück",
-    "next": "Weiter"
+    "next": "Weiter",
+    "menu": "Menü",
+    "close": "Schließen"
   }
 }

@@ -39,6 +39,15 @@ export interface SummaryFilters {
   client_id: number | null;
 }
 
+export interface RevenueStatus {
+  month_to_date: number;
+  today: number;
+  projected_month: number;
+  target_month: number;
+  pace_pct: number;
+  currency: string;
+}
+
 export interface SummaryResponse {
   filters: SummaryFilters;
   as_of: string;
@@ -47,6 +56,7 @@ export interface SummaryResponse {
     orders_total: KpiValue;
     orders_today: KpiValue;
     token_status: TokenStatus;
+    revenue: RevenueStatus;
   };
 }
 

@@ -7,5 +7,7 @@ export function useOrdersTimeline(filters: DashboardFilters) {
   return useQuery({
     queryKey: ["dashboard", "timeline", filters],
     queryFn: () => fetchTimeline(filters.month, filters.clientId),
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: false,
   });
 }

@@ -1,9 +1,10 @@
-import { FileText, Files, Send, TrendingUp } from "lucide-react";
+import { Euro, FileText, Files, Send, TrendingUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { KpiCard } from "@/components/dashboard/KpiCard";
+import { RunRateCard } from "@/components/dashboard/RunRateCard";
 import { TokenStatusCard } from "@/components/dashboard/TokenStatusCard";
 import { OrdersChart } from "@/components/dashboard/OrdersChart";
 import { RefreshButton } from "@/components/dashboard/RefreshButton";
@@ -11,7 +12,7 @@ import { useDashboardFilters } from "@/hooks/useDashboardFilters";
 import { useDashboardSummary } from "@/hooks/useDashboardSummary";
 import { useOrdersTimeline } from "@/hooks/useOrdersTimeline";
 import { useNow } from "@/hooks/useNow";
-import { formatNumber } from "@/lib/format";
+import { formatCurrency, formatNumber } from "@/lib/format";
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
@@ -28,6 +29,8 @@ export function DashboardPage() {
   }).format(now);
 
   const kpis = summary.data?.kpis;
+  const revenue = kpis?.revenue;
+  const currency = revenue?.currency ?? "EUR";
 
   return (
     <div className="space-y-6">
@@ -37,7 +40,10 @@ export function DashboardPage() {
           <p className="text-sm text-muted-foreground">{t("dashboard.subtitle")}</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground sm:gap-3">
-          <span className="hidden sm:inline">{t("dashboard.as_of", { time: timeLabel })}</span>
+          <span className="hidden items-center gap-1.5 sm:inline-flex">
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald-500" aria-hidden="true" />
+            {t("dashboard.as_of", { time: timeLabel })}
+          </span>
           <Button variant="outline" size="icon" aria-label={t("dashboard.send")}>
             <Send className="h-4 w-4" />
           </Button>
@@ -45,12 +51,40 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <KpiCard
+          icon={<Euro className="h-4 w-4 text-primary" />}
+          label={t("dashboard.kpi.revenue_month")}
+          value={formatCurrency(revenue?.month_to_date ?? 0, locale, currency)}
+          sublabel={t("dashboard.kpi.revenue_today", {
+            value: formatCurrency(revenue?.today ?? 0, locale, currency),
+          })}
+        />
+        <RunRateCard
+          projected={revenue?.projected_month ?? 0}
+          target={revenue?.target_month ?? 0}
+          pacePct={revenue?.pace_pct ?? 0}
+          currency={currency}
+          locale={locale}
+        />
         <KpiCard
           icon={<FileText className="h-4 w-4 text-primary" />}
           label={t("dashboard.kpi.orders_month")}
           value={formatNumber(kpis?.orders_month.value ?? 0, locale)}
+          sublabel={t("dashboard.kpi.orders_today_short", {
+            value: formatNumber(kpis?.orders_today.value ?? 0, locale),
+          })}
         />
+        <TokenStatusCard
+          label={t("dashboard.kpi.token_status")}
+          tokensUsed={kpis?.token_status.tokens_used ?? 0}
+          quota={kpis?.token_status.quota ?? 0}
+          percentUsed={kpis?.token_status.percent_used ?? 0}
+          locale={locale}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard
           icon={<Files className="h-4 w-4 text-primary" />}
           label={t("dashboard.kpi.orders_total")}
@@ -60,13 +94,6 @@ export function DashboardPage() {
           icon={<TrendingUp className="h-4 w-4 text-primary" />}
           label={t("dashboard.kpi.orders_today")}
           value={formatNumber(kpis?.orders_today.value ?? 0, locale)}
-        />
-        <TokenStatusCard
-          label={t("dashboard.kpi.token_status")}
-          tokensUsed={kpis?.token_status.tokens_used ?? 0}
-          quota={kpis?.token_status.quota ?? 0}
-          percentUsed={kpis?.token_status.percent_used ?? 0}
-          locale={locale}
         />
       </div>
 

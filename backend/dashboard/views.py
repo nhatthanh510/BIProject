@@ -50,6 +50,14 @@ class SummaryView(APIView):
                         "quota": summary.token_status.quota,
                         "percent_used": summary.token_status.percent_used,
                     },
+                    "revenue": {
+                        "month_to_date": summary.revenue.month_to_date,
+                        "today": summary.revenue.today,
+                        "projected_month": summary.revenue.projected_month,
+                        "target_month": summary.revenue.target_month,
+                        "pace_pct": summary.revenue.pace_pct,
+                        "currency": summary.revenue.currency,
+                    },
                 },
             }
         )

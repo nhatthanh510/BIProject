@@ -12,14 +12,19 @@
   "dashboard": {
     "title": "AI/OCR Order Monitor",
     "subtitle": "Analysis of order development",
-    "as_of": "As of today, {{time}}",
+    "as_of": "Live · {{time}}",
     "send": "Send",
     "refresh": "Refresh",
     "kpi": {
       "orders_month": "Orders (month)",
       "orders_total": "Orders (total)",
       "orders_today": "Orders today",
-      "token_status": "Token status"
+      "orders_today_short": "Today: {{value}}",
+      "token_status": "Token status",
+      "revenue_month": "Revenue (month)",
+      "revenue_today": "Today: {{value}}",
+      "projected_month": "Projected month-end",
+      "of_target": "of target {{target}}"
     },
     "chart": {
       "title": "Order development",
@@ -46,6 +51,8 @@
   "common": {
     "loading": "Loading...",
     "prev": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "menu": "Menu",
+    "close": "Close"
   }
 }

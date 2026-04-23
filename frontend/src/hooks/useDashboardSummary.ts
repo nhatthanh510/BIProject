@@ -7,5 +7,7 @@ export function useDashboardSummary(filters: DashboardFilters) {
   return useQuery({
     queryKey: ["dashboard", "summary", filters],
     queryFn: () => fetchSummary(filters.month, filters.clientId),
+    refetchInterval: 10_000,
+    refetchIntervalInBackground: false,
   });
 }

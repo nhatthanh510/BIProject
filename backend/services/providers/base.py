@@ -34,6 +34,22 @@ class TokenStatus:
 
 
 @dataclass
+class RevenueStatus:
+    month_to_date: float
+    today: float
+    projected_month: float
+    target_month: float
+    currency: str = "EUR"
+
+    @property
+    def pace_pct(self) -> float:
+        """Projected / target * 100. >100 means on pace to beat target."""
+        if self.target_month <= 0:
+            return 0.0
+        return round((self.projected_month / self.target_month) * 100, 1)
+
+
+@dataclass
 class SummaryDTO:
     as_of: datetime
     month: date
@@ -42,6 +58,7 @@ class SummaryDTO:
     orders_total: KpiValue
     orders_today: KpiValue
     token_status: TokenStatus
+    revenue: RevenueStatus
 
 
 @dataclass

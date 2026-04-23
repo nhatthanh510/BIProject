@@ -5,6 +5,19 @@ export function formatNumber(n: number, locale: Locale = "de"): string {
   return new Intl.NumberFormat(LOCALE_MAP[locale]).format(n);
 }
 
+export function formatCurrency(
+  n: number,
+  locale: Locale = "de",
+  currency = "EUR",
+  maximumFractionDigits = 0,
+): string {
+  return new Intl.NumberFormat(LOCALE_MAP[locale], {
+    style: "currency",
+    currency,
+    maximumFractionDigits,
+  }).format(n);
+}
+
 export function toMonthKey(d: Date): string {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, "0");
