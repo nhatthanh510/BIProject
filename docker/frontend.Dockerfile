@@ -4,11 +4,11 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-COPY frontend/package.json frontend/package-lock.json* ./
-RUN npm install
+COPY frontend/package.json frontend/yarn.lock ./
+RUN yarn install --frozen-lockfile
 
 COPY frontend/ ./
-RUN npm run build
+RUN yarn build
 
 FROM nginx:1.27-alpine
 
