@@ -108,12 +108,11 @@ class Command(BaseCommand):
                 "role": User.Role.ADMIN,
             },
         )
-        if created:
-            user.set_password(password)
-            user.save()
-            self.stdout.write(self.style.SUCCESS(f"Created admin user {email}"))
-        else:
-            self.stdout.write(f"Admin user {email} already exists, leaving password untouched.")
+        user.set_password(password)
+        user.save()
+        self.stdout.write(self.style.SUCCESS(
+            f"{'Created' if created else 'Updated'} admin user {email}"
+        ))
 
     def _ensure_clients(self, rng: random.Random, count: int) -> list[Client]:
         names = GERMAN_CLIENT_NAMES[:count]
